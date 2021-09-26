@@ -1,13 +1,13 @@
-﻿import { Component, Inject, OnInit, SecurityContext } from "@angular/core";
-import { first } from "rxjs/operators";
-import { User } from "@app/_models";
-import { AuthenticationService, UserService } from "@app/_services";
-import { FilesListService } from "@app/_services/files-list.service";
-import { DomSanitizer } from "@angular/platform-browser";
-import { saveAs } from "file-saver";
-const STORE_KEY = "lastAction";
+﻿import { Component, Inject, OnInit, SecurityContext } from '@angular/core';
+import { first } from 'rxjs/operators';
+import { User } from '@app/_models';
+import { AuthenticationService, UserService } from '@app/_services';
+import { FilesListService } from '@app/_services/files-list.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { saveAs } from 'file-saver';
+const STORE_KEY = 'lastAction';
 
-@Component({ templateUrl: "home.component.html" })
+@Component({ templateUrl: 'home.component.html' })
 export class HomeComponent implements OnInit {
   loading = false;
   users: User[];
@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   tmppath;
   isDisabledUpload: boolean;
   uploadFinished: boolean;
+  x = [];
 
   constructor(
     private userService: UserService,
@@ -67,9 +68,9 @@ export class HomeComponent implements OnInit {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = (reader.result as string)
-        .replace("data:", "")
-        .replace(/^.+,/, "");
-      localStorage.setItem("file", base64String);
+        .replace('data:', '')
+        .replace(/^.+,/, '');
+      localStorage.setItem('file', base64String);
     };
     reader.readAsDataURL(this.testeFile);
     this.uploadFinished = true;
@@ -78,15 +79,15 @@ export class HomeComponent implements OnInit {
     }, 700);
   }
 
-  downloadFile(data) {
+  downloadFile(data, name) {
     const byteCharacters = atob(data);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const file = new Blob([byteArray], { type: "application/mime;base64" });
+    const file = new Blob([byteArray], { type: 'application/mime;base64' });
     const fileURL = URL.createObjectURL(file);
-    saveAs(fileURL);
+    saveAs(fileURL, name);
   }
 }

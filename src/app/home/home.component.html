@@ -5,7 +5,7 @@
       <mat-icon mat-list-icon>folder</mat-icon>
       <a matLine href="...">{{ item.name }}</a>
       <button mat-button color="warn">
-        <mat-icon mat-list-icon (click)="downloadFile(item.content)">
+        <mat-icon mat-list-icon (click)="downloadFile(item.content, item.name)">
           arrow_circle_down</mat-icon
         >
       </button>
