@@ -56,8 +56,8 @@ export class HomeComponent {
     reader.readAsDataURL(this.testeFile);
   }
 
-  save(data) {
-    const byteCharacters = atob(data);
+  save(data2) {
+    const byteCharacters = atob(data2);
     const byteNumbers = new Array(byteCharacters.length);
     for (var i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
