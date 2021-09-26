@@ -2,60 +2,105 @@
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
-
 import { AuthenticationService } from '@app/_services';
+const MINUTES_UNITL_AUTO_LOGOUT = 5; // in mins
+const CHECK_INTERVAL = 15000; // in ms
+const STORE_KEY = 'lastAction';
 
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
-    loginForm: FormGroup;
-    loading = false;
-    submitted = false;
-    returnUrl: string;
-    error = '';
+  loginForm: FormGroup;
+  loading = false;
+  submitted = false;
+  returnUrl: string;
+  error = '';
 
-    constructor(
-        private formBuilder: FormBuilder,
-        private route: ActivatedRoute,
-        private router: Router,
-        private authenticationService: AuthenticationService
-    ) { 
-        // redirect to home if already logged in
-        if (this.authenticationService.currentUserValue) { 
-            this.router.navigate(['/']);
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) {
+    if (this.authenticationService.currentUserValue) {
+      this.router.navigate(['/']);
+    }
+    this.check();
+    this.initListener();
+    this.initInterval();
+    localStorage.setItem(STORE_KEY, Date.now().toString());
+  }
+
+  initListener() {
+    window.addEventListener('click', () => this.reset());
+    window.addEventListener('open', () => this.reset());
+    document.body.addEventListener('mouseover', () => this.reset());
+    window.addEventListener('mouseout', () => this.reset());
+  }
+  reset() {
+    this.setLastAction(Date.now());
+  }
+
+  initInterval() {
+    setInterval(() => {
+      this.check();
+    }, CHECK_INTERVAL);
+  }
+
+  check() {
+    const now = Date.now();
+    const timeleft =
+      this.getLastAction() + MINUTES_UNITL_AUTO_LOGOUT * 2 * 1000;
+    const diff = timeleft - now;
+    const isTimeout = diff < 0;
+    if (isTimeout) {
+      localStorage.clear();
+      this.authenticationService.logout();
+      this.router.navigate(['/login']);
+    }
+  }
+
+  public getLastAction() {
+    return parseInt(localStorage.getItem(STORE_KEY));
+  }
+  public setLastAction(lastAction: number) {
+    localStorage.setItem(STORE_KEY, lastAction.toString());
+  }
+
+  ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+
+    // get return url from route parameters or default to '/'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
+
+  // convenience getter for easy access to form fields
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  onSubmit() {
+    this.submitted = true;
+
+    // stop here if form is invalid
+    if (this.loginForm.invalid) {
+      return;
+    }
+
+    this.loading = true;
+    this.authenticationService
+      .login(this.f.username.value, this.f.password.value)
+      .pipe(first())
+      .subscribe(
+        (data) => {
+          this.router.navigate([this.returnUrl]);
+        },
+        (error) => {
+          this.error = error;
+          this.loading = false;
         }
-    }
-
-    ngOnInit() {
-        this.loginForm = this.formBuilder.group({
-            username: ['', Validators.required],
-            password: ['', Validators.required]
-        });
-
-        // get return url from route parameters or default to '/'
-        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    }
-
-    // convenience getter for easy access to form fields
-    get f() { return this.loginForm.controls; }
-
-    onSubmit() {
-        this.submitted = true;
-
-        // stop here if form is invalid
-        if (this.loginForm.invalid) {
-            return;
-        }
-
-        this.loading = true;
-        this.authenticationService.login(this.f.username.value, this.f.password.value)
-            .pipe(first())
-            .subscribe(
-                data => {
-                    this.router.navigate([this.returnUrl]);
-                },
-                error => {
-                    this.error = error;
-                    this.loading = false;
-                });
-    }
+      );
+  }
 }

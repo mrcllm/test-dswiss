@@ -1,8 +1,4 @@
 ﻿<div class="col-md-6 offset-md-3 mt-5">
-  <div class="alert alert-info">
-    Username: test<br />
-    Password: test
-  </div>
   <div class="card">
     <h4 class="card-header">dSwiss</h4>
     <div class="card-body">
@@ -13,6 +9,7 @@
             type="text"
             formControlName="username"
             class="form-control"
+            class="username_input"
             [ngClass]="{ 'is-invalid': submitted && f.username.errors }"
           />
           <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
@@ -25,19 +22,14 @@
             type="password"
             formControlName="password"
             class="form-control"
+            class="password_input"
             [ngClass]="{ 'is-invalid': submitted && f.password.errors }"
           />
           <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
             <div *ngIf="f.password.errors.required">Password is required</div>
           </div>
         </div>
-        <button [disabled]="loading" class="btn btn-primary">
-          <span
-            *ngIf="loading"
-            class="spinner-border spinner-border-sm mr-1"
-          ></span>
-          Login
-        </button>
+        <button [disabled]="loading" class="btn btn-secondary">Login</button>
         <div *ngIf="error" class="alert alert-danger mt-3 mb-0">
           {{ error }}
         </div>

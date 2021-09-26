@@ -1,11 +1,18 @@
-﻿<div class="col-md-6 offset-md-3 mt-5">
-  <ul class="list-group">
-    <li class="list-group-item" *ngFor="let item of file">
-      {{ item.name }}
-      <button type="button" (click)="save(item.content)">Baixar arquivo</button>
-    </li>
-  </ul>
-</div>
+﻿<section class="wrapper">
+  <mat-nav-list class="wrapper__list">
+    <h3>Documents List</h3>
+    <mat-list-item *ngFor="let item of file">
+      <mat-icon mat-list-icon>folder</mat-icon>
+      <a matLine href="...">{{ item.name }}</a>
+      <button mat-button color="warn">
+        <mat-icon mat-list-icon (click)="downloadFile(item.content)">
+          arrow_circle_down</mat-icon
+        >
+      </button>
+    </mat-list-item>
+  </mat-nav-list>
+</section>
+
 <div class="col-md-6 offset-md-3 mt-5">
   <div class="input-group">
     <div class="custom-file">
@@ -13,28 +20,22 @@
         type="file"
         class="custom-file-input"
         id="file"
-        (change)="teste($event)"
+        (change)="chooseFile($event)"
       />
-      <label class="custom-file-label" id="fileName">Choose file</label>
+      <label class="custom-file-label" id="fileName">{{ tmppath }} </label>
     </div>
     <div class="input-group-append">
       <button
         class="btn btn-outline-secondary"
-        (click)="teste2()"
+        (click)="uploadFile()"
         type="button"
+        [disabled]="!isDisabledUpload"
       >
         Upload
       </button>
     </div>
   </div>
-</div>
-
-<div class="container min-vh-100 py-2">
-  <div class="row">
-    <div class="col">
-      <div class="mb-3">
-        <input class="form-control" type="file" id="formFile" />
-      </div>
-    </div>
+  <div class="alert alert-success" *ngIf="uploadFinished" role="alert">
+    Upload was successful!
   </div>
 </div>
