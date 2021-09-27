@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class FilesListService {
   constructor(private http: HttpClient) {}
 
   getFilesList(): Observable<any> {
-    return this.http.get("../../assets/files.json");
+    return this.http.get('../../assets/files.json');
   }
 }

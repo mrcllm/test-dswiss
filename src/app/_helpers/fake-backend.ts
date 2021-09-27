@@ -1,4 +1,4 @@
-﻿import { Injectable } from "@angular/core";
+﻿import { Injectable } from '@angular/core';
 import {
   HttpRequest,
   HttpResponse,
@@ -6,18 +6,18 @@ import {
   HttpEvent,
   HttpInterceptor,
   HTTP_INTERCEPTORS,
-} from "@angular/common/http";
-import { Observable, of, throwError } from "rxjs";
-import { delay, mergeMap, materialize, dematerialize } from "rxjs/operators";
-import { User } from "@app/_models";
+} from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
+import { User } from '@app/_models';
 
 const users: User[] = [
   {
     id: 1,
-    username: "test",
-    password: "test",
-    firstName: "Test",
-    lastName: "User",
+    username: 'test',
+    password: 'test',
+    firstName: 'Test',
+    lastName: 'User',
   },
 ];
 
@@ -32,15 +32,15 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     // wrap in delayed observable to simulate server api call
     return of(null)
       .pipe(mergeMap(handleRoute))
-      .pipe(materialize()) // call materialize and dematerialize to ensure delay even if an error is thrown (https://github.com/Reactive-Extensions/RxJS/issues/648)
+      .pipe(materialize())
       .pipe(delay(500))
       .pipe(dematerialize());
 
     function handleRoute() {
       switch (true) {
-        case url.endsWith("/users/authenticate") && method === "POST":
+        case url.endsWith('/users/authenticate') && method === 'POST':
           return authenticate();
-        case url.endsWith("/users") && method === "GET":
+        case url.endsWith('/users') && method === 'GET':
           return getUsers();
         default:
           // pass through any requests not handled above
@@ -48,14 +48,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       }
     }
 
-    // route functions
-
     function authenticate() {
       const { username, password } = body;
       const user = users.find(
         (x) => x.username === username && x.password === password
       );
-      if (!user) return error("Username or password is incorrect");
+      if (!user) {
+        return error('Username or password is incorrect');
+      }
       return ok({
         id: user.id,
         username: user.username,
@@ -65,7 +65,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
 
     function getUsers() {
-      if (!isLoggedIn()) return unauthorized();
+      if (!isLoggedIn()) {
+        return unauthorized();
+      }
       return ok(users);
     }
 
@@ -80,12 +82,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
 
     function unauthorized() {
-      return throwError({ status: 401, error: { message: "Unauthorised" } });
+      return throwError({ status: 401, error: { message: 'Unauthorised' } });
     }
 
     function isLoggedIn() {
       return (
-        headers.get("Authorization") === `Basic ${window.btoa("test:test")}`
+        headers.get('Authorization') === `Basic ${window.btoa('test:test')}`
       );
     }
   }
